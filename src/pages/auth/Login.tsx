@@ -29,19 +29,10 @@ const Login: React.FC = () => {
       if (authError) throw authError;
 
       // Si el login es exitoso, guardamos el rol seleccionado para la sesión actual
-      // (En una app real, esto vendría de la tabla 'profiles' vinculada al 'data.user.id')
       localStorage.setItem('userRole', role);
       navigate('/dashboard');
     } catch (err: any) {
       setError(err.message || 'Error al iniciar sesión');
-      
-      // MODO DEMO: Si las credenciales de Supabase no están configuradas, 
-      // permitimos el acceso para que el usuario vea el progreso visual.
-      if (!import.meta.env.VITE_SUPABASE_URL || import.meta.env.VITE_SUPABASE_URL.includes('your-project')) {
-        console.warn('Usando modo demo debido a falta de credenciales de Supabase');
-        localStorage.setItem('userRole', role);
-        setTimeout(() => navigate('/dashboard'), 1000);
-      }
     } finally {
       setLoading(false);
     }

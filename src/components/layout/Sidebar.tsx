@@ -8,6 +8,7 @@ import {
   LogOut,
   GraduationCap
 } from 'lucide-react';
+import { supabase } from '../../lib/supabase';
 import styles from './Sidebar.module.css';
 
 interface SidebarItemProps {
@@ -25,6 +26,12 @@ const SidebarItem: React.FC<SidebarItemProps> = ({ icon: Icon, label, active }) 
 
 export const Sidebar: React.FC = () => {
   const role = localStorage.getItem('userRole') || 'alumno';
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    localStorage.removeItem('userRole');
+    window.location.href = '/login';
+  };
 
   const menuItems = [
     { icon: LayoutDashboard, label: "Dashboard", roles: ['alumno', 'docente', 'administrativo'] },
@@ -57,10 +64,7 @@ export const Sidebar: React.FC = () => {
         
         <div className={styles.footer}>
           <SidebarItem icon={Settings} label="Configuración" />
-          <div onClick={() => {
-            localStorage.removeItem('userRole');
-            window.location.href = '/';
-          }}>
+          <div onClick={handleLogout} style={{ cursor: 'pointer' }}>
             <SidebarItem icon={LogOut} label="Cerrar Sesión" />
           </div>
         </div>

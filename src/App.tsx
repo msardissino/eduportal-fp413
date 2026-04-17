@@ -4,6 +4,8 @@ import Landing from './pages/landing/Landing';
 import Login from './pages/auth/Login';
 import Dashboard from './pages/dashboard/Dashboard';
 
+import { ProtectedRoute } from './components/auth/ProtectedRoute';
+
 function App() {
   return (
     <BrowserRouter>
@@ -13,9 +15,11 @@ function App() {
         <Route 
           path="/dashboard" 
           element={
-            <Layout>
-              <Dashboard />
-            </Layout>
+            <ProtectedRoute>
+              <Layout>
+                <Dashboard />
+              </Layout>
+            </ProtectedRoute>
           } 
         />
         <Route path="*" element={<Navigate to="/" replace />} />
