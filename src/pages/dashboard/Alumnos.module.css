@@ -121,17 +121,42 @@
   color: var(--text-dim);
 }
 
+.actions {
+  display: flex;
+  gap: 8px;
+}
+
 .editBtn {
-  padding: 8px 16px;
-  background: transparent;
-  border: 1px solid var(--border);
-  color: var(--text-muted);
+  padding: 8px;
+  background: rgba(var(--primary-rgb), 0.1);
+  border: 1px solid rgba(var(--primary-rgb), 0.3);
+  color: var(--primary);
   border-radius: var(--radius-sm);
-  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition);
 }
 
 .editBtn:hover {
-  border-color: var(--text-dim);
+  background: var(--primary);
+  color: black;
+}
+
+.deleteBtn {
+  padding: 8px;
+  background: rgba(255, 71, 87, 0.1);
+  border: 1px solid rgba(255, 71, 87, 0.3);
+  color: #ff4757;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition);
+}
+
+.deleteBtn:hover {
+  background: #ff4757;
   color: white;
 }
 

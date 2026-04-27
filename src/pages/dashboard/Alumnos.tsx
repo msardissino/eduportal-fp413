@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, UserPlus, Mail, Fingerprint, Briefcase, X } from 'lucide-react';
+import { Search, UserPlus, Mail, Fingerprint, Briefcase, X, Edit2, Trash2, User } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import styles from './Alumnos.module.css';
 
@@ -10,12 +10,15 @@ interface Alumno {
   email: string;
   dni: string;
   situacion_laboral: string;
+  estudios_previos?: string;
 }
 
 const Alumnos: React.FC = () => {
   const navigate = useNavigate();
   const [alumnos, setAlumnos] = useState<Alumno[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
 
   // Form State
@@ -37,38 +40,86 @@ const Alumnos: React.FC = () => {
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
-        .eq('role', 'alumno');
+        .eq('role', 'alumno')
+        .order('full_name');
 
       if (error) throw error;
       setAlumnos(data || []);
     } catch (error) {
       console.error('Error fetching alumnos:', error);
-      // Mock data
-      setAlumnos([
-        { id: '1', full_name: 'Juan Pérez', email: 'juan@example.com', dni: '12345678', situacion_laboral: 'Empleado' },
-        { id: '2', full_name: 'María García', email: 'maria@example.com', dni: '87654321', situacion_laboral: 'Desempleado' },
-      ]);
     }
   };
 
-  const handleCreateAlumno = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleOpenCreate = () => {
+    setIsEditing(false);
+    setEditingId(null);
+    setFormData({
+      full_name: '',
+      email: '',
+      dni: '',
+      situacion_laboral: 'Desempleado',
+      estudios_previos: '',
+      role: 'alumno'
+    });
+    setIsModalOpen(true);
+  };
+
+  const handleOpenEdit = (alumno: Alumno) => {
+    setIsEditing(true);
+    setEditingId(alumno.id);
+    setFormData({
+      full_name: alumno.full_name,
+      email: alumno.email,
+      dni: alumno.dni,
+      situacion_laboral: alumno.situacion_laboral,
+      estudios_previos: alumno.estudios_previos || '',
+      role: 'alumno'
+    });
+    setIsModalOpen(true);
+  };
+
+  const handleDeleteAlumno = async (id: string, name: string) => {
+    if (!window.confirm(`¿Estás seguro de que deseas eliminar a ${name}?`)) return;
+
     try {
       const { error } = await supabase
         .from('profiles')
-        .insert([{
-          ...formData,
-          id: crypto.randomUUID()
-        }]);
+        .delete()
+        .eq('id', id);
 
       if (error) throw error;
-      setIsModalOpen(false);
       fetchAlumnos();
-      setFormData({ full_name: '', email: '', dni: '', situacion_laboral: 'Desempleado', estudios_previos: '', role: 'alumno' });
     } catch (error) {
-      alert('Error al registrar alumno.');
+      alert('Error al eliminar el alumno.');
     }
   };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      if (isEditing && editingId) {
+        const { error } = await supabase
+          .from('profiles')
+          .update(formData)
+          .eq('id', editingId);
+        if (error) throw error;
+      } else {
+        const { error } = await supabase
+          .from('profiles')
+          .insert([{
+            ...formData,
+            id: crypto.randomUUID()
+          }]);
+        if (error) throw error;
+      }
+
+      setIsModalOpen(false);
+      fetchAlumnos();
+    } catch (error) {
+      alert(isEditing ? 'Error al actualizar alumno.' : 'Error al registrar alumno.');
+    }
+  };
+
   const filtered = alumnos.filter(a => 
     a.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     a.dni.includes(searchTerm)
@@ -81,7 +132,7 @@ const Alumnos: React.FC = () => {
           <h1 className="gradient-text">Registro de Alumnos</h1>
           <p className={styles.subtitle}>Base de datos unificada de estudiantes del CFP 413.</p>
         </div>
-        <button className={styles.addBtn} onClick={() => setIsModalOpen(true)}>
+        <button className={styles.addBtn} onClick={handleOpenCreate}>
           <UserPlus size={20} />
           Registrar Alumno
         </button>
@@ -136,28 +187,46 @@ const Alumnos: React.FC = () => {
                   </div>
                 </td>
                 <td>
-                  <button 
-                    className={styles.editBtn}
-                    onClick={() => navigate(`/dashboard/perfil/${alumno.id}`)}
-                  >
-                    Perfil
-                  </button>
+                  <div className={styles.actions}>
+                    <button 
+                      className={styles.editBtn}
+                      title="Ver Perfil"
+                      onClick={() => navigate(`/dashboard/perfil/${alumno.id}`)}
+                    >
+                      <User size={18} />
+                    </button>
+                    <button 
+                      className={styles.editBtn}
+                      title="Editar"
+                      onClick={() => handleOpenEdit(alumno)}
+                    >
+                      <Edit2 size={18} />
+                    </button>
+                    <button 
+                      className={styles.deleteBtn}
+                      title="Eliminar"
+                      onClick={() => handleDeleteAlumno(alumno.id, alumno.full_name)}
+                    >
+                      <Trash2 size={18} />
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
+
       {isModalOpen && (
         <div className={styles.modalOverlay}>
           <div className={`${styles.modal} glass`}>
             <div className={styles.modalHeader}>
-              <h2>Registrar Nuevo Alumno</h2>
+              <h2>{isEditing ? 'Editar Alumno' : 'Registrar Nuevo Alumno'}</h2>
               <button className={styles.closeBtn} onClick={() => setIsModalOpen(false)}>
                 <X size={24} />
               </button>
             </div>
-            <form className={styles.form} onSubmit={handleCreateAlumno}>
+            <form className={styles.form} onSubmit={handleSubmit}>
               <div className={styles.formGroup}>
                 <label>Nombre Completo</label>
                 <input 
@@ -204,7 +273,9 @@ const Alumnos: React.FC = () => {
                   placeholder="Ej: Secundario Completo, Curso de Inglés..."
                 />
               </div>
-              <button type="submit" className={styles.submitBtn}>Registrar en el Sistema</button>
+              <button type="submit" className={styles.submitBtn}>
+                {isEditing ? 'Guardar Cambios' : 'Registrar en el Sistema'}
+              </button>
             </form>
           </div>
         </div>

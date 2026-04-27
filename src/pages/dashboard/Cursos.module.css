@@ -150,21 +150,58 @@
 
 .cardActions {
   margin-top: auto;
+  display: flex;
+  gap: 8px;
 }
 
 .viewBtn {
-  width: 100%;
+  flex: 1;
   padding: 12px;
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid var(--border);
   color: white;
   border-radius: var(--radius-md);
   font-weight: 600;
+  transition: var(--transition);
 }
 
 .viewBtn:hover {
   background: var(--bg-surface-light);
   border-color: var(--text-dim);
+}
+
+.editBtn {
+  padding: 12px;
+  background: rgba(var(--primary-rgb), 0.1);
+  border: 1px solid rgba(var(--primary-rgb), 0.3);
+  color: var(--primary);
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition);
+}
+
+.editBtn:hover {
+  background: var(--primary);
+  color: black;
+}
+
+.deleteBtn {
+  padding: 12px;
+  background: rgba(255, 71, 87, 0.1);
+  border: 1px solid rgba(255, 71, 87, 0.3);
+  color: #ff4757;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition);
+}
+
+.deleteBtn:hover {
+  background: #ff4757;
+  color: white;
 }
 
 /* Modal */

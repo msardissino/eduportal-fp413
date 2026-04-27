@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Search, Filter, Book, Clock, GraduationCap, X } from 'lucide-react';
+import { Plus, Search, Filter, Book, Clock, GraduationCap, X, Edit2, Trash2 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import styles from './Cursos.module.css';
 
@@ -14,11 +14,19 @@ interface Course {
   created_at: string;
 }
 
+interface Docente {
+  id: string;
+  full_name: string;
+}
+
 const Cursos: React.FC = () => {
   const navigate = useNavigate();
   const [courses, setCourses] = useState<Course[]>([]);
+  const [docentes, setDocentes] = useState<Docente[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const role = localStorage.getItem('userRole') || 'alumno';
 
@@ -27,11 +35,13 @@ const Cursos: React.FC = () => {
     nombre: '',
     nivel: 'Básico',
     carga_horaria_total: 0,
-    modalidad: 'Presencial'
+    modalidad: 'Presencial',
+    id_docente: ''
   });
 
   useEffect(() => {
     fetchCourses();
+    fetchDocentes();
   }, []);
 
   const fetchCourses = async () => {
@@ -46,30 +56,92 @@ const Cursos: React.FC = () => {
       setCourses(data || []);
     } catch (error) {
       console.error('Error fetching courses:', error);
-      // Fallback a datos mock si falla o no existe la tabla aún
-      setCourses([
-        { id: '1', nombre: 'Programación Web Fullstack', nivel: 'Intermedio', carga_horaria_total: 240, modalidad: 'Híbrida', created_at: new Date().toISOString() },
-        { id: '2', nombre: 'Introducción a la Electrónica', nivel: 'Básico', carga_horaria_total: 120, modalidad: 'Presencial', created_at: new Date().toISOString() },
-      ]);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleCreateCourse = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const fetchDocentes = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('id, full_name')
+        .eq('role', 'docente');
+      
+      if (error) throw error;
+      setDocentes(data || []);
+    } catch (error) {
+      console.error('Error fetching docentes:', error);
+    }
+  };
+
+  const handleOpenCreate = () => {
+    setIsEditing(false);
+    setEditingId(null);
+    setFormData({
+      nombre: '',
+      nivel: 'Básico',
+      carga_horaria_total: 0,
+      modalidad: 'Presencial',
+      id_docente: ''
+    });
+    setIsModalOpen(true);
+  };
+
+  const handleOpenEdit = (course: Course) => {
+    setIsEditing(true);
+    setEditingId(course.id);
+    setFormData({
+      nombre: course.nombre,
+      nivel: course.nivel,
+      carga_horaria_total: course.carga_horaria_total,
+      modalidad: course.modalidad,
+      id_docente: course.id_docente || ''
+    });
+    setIsModalOpen(true);
+  };
+
+  const handleDeleteCourse = async (id: string, name: string) => {
+    if (!window.confirm(`¿Estás seguro de que deseas eliminar el curso "${name}"?`)) return;
+
     try {
       const { error } = await supabase
         .from('cursos')
-        .insert([formData]);
+        .delete()
+        .eq('id', id);
 
       if (error) throw error;
+      fetchCourses();
+    } catch (error) {
+      alert('Error al eliminar el curso.');
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const payload = {
+        ...formData,
+        id_docente: formData.id_docente || null
+      };
+
+      if (isEditing && editingId) {
+        const { error } = await supabase
+          .from('cursos')
+          .update(payload)
+          .eq('id', editingId);
+        if (error) throw error;
+      } else {
+        const { error } = await supabase
+          .from('cursos')
+          .insert([payload]);
+        if (error) throw error;
+      }
       
       setIsModalOpen(false);
       fetchCourses();
-      setFormData({ nombre: '', nivel: 'Básico', carga_horaria_total: 0, modalidad: 'Presencial' });
     } catch (error) {
-      alert('Error al crear el curso. ¿Ya ejecutaste el script SQL en Supabase?');
+      alert(isEditing ? 'Error al actualizar el curso.' : 'Error al crear el curso.');
     }
   };
 
@@ -85,7 +157,7 @@ const Cursos: React.FC = () => {
           <p className={styles.subtitle}>Administra la oferta académica oficial del CFP 413.</p>
         </div>
         {role === 'administrativo' && (
-          <button className={styles.addBtn} onClick={() => setIsModalOpen(true)}>
+          <button className={styles.addBtn} onClick={handleOpenCreate}>
             <Plus size={20} />
             Nuevo Curso
           </button>
@@ -140,25 +212,43 @@ const Cursos: React.FC = () => {
                   className={styles.viewBtn} 
                   onClick={() => navigate(`/dashboard/cursos/${course.id}`)}
                 >
-                  Ver Detalles
+                  Ver
                 </button>
+                {role === 'administrativo' && (
+                  <>
+                    <button 
+                      className={styles.editBtn}
+                      title="Editar Curso"
+                      onClick={() => handleOpenEdit(course)}
+                    >
+                      <Edit2 size={18} />
+                    </button>
+                    <button 
+                      className={styles.deleteBtn}
+                      title="Eliminar Curso"
+                      onClick={() => handleDeleteCourse(course.id, course.nombre)}
+                    >
+                      <Trash2 size={18} />
+                    </button>
+                  </>
+                )}
               </div>
             </div>
           ))}
         </div>
       )}
 
-      {/* Modal de Nuevo Curso */}
+      {/* Modal de Curso (Alta/Edición) */}
       {isModalOpen && (
         <div className={styles.modalOverlay}>
           <div className={`${styles.modal} glass`}>
             <div className={styles.modalHeader}>
-              <h2>Crear Nuevo Curso</h2>
+              <h2>{isEditing ? 'Editar Curso' : 'Crear Nuevo Curso'}</h2>
               <button className={styles.closeBtn} onClick={() => setIsModalOpen(false)}>
                 <X size={24} />
               </button>
             </div>
-            <form className={styles.form} onSubmit={handleCreateCourse}>
+            <form className={styles.form} onSubmit={handleSubmit}>
               <div className={styles.formGroup}>
                 <label>Nombre del Curso</label>
                 <input 
@@ -193,16 +283,32 @@ const Cursos: React.FC = () => {
                   </select>
                 </div>
               </div>
-              <div className={styles.formGroup}>
-                <label>Carga Horaria Total</label>
-                <input 
-                  type="number" 
-                  required 
-                  value={formData.carga_horaria_total}
-                  onChange={(e) => setFormData({...formData, carga_horaria_total: parseInt(e.target.value)})}
-                />
+              <div className={styles.formRow}>
+                <div className={styles.formGroup}>
+                  <label>Carga Horaria</label>
+                  <input 
+                    type="number" 
+                    required 
+                    value={formData.carga_horaria_total}
+                    onChange={(e) => setFormData({...formData, carga_horaria_total: parseInt(e.target.value)})}
+                  />
+                </div>
+                <div className={styles.formGroup}>
+                  <label>Docente Asignado</label>
+                  <select 
+                    value={formData.id_docente}
+                    onChange={(e) => setFormData({...formData, id_docente: e.target.value})}
+                  >
+                    <option value="">Sin asignar</option>
+                    {docentes.map(d => (
+                      <option key={d.id} value={d.id}>{d.full_name}</option>
+                    ))}
+                  </select>
+                </div>
               </div>
-              <button type="submit" className={styles.submitBtn}>Publicar Curso</button>
+              <button type="submit" className={styles.submitBtn}>
+                {isEditing ? 'Guardar Cambios' : 'Publicar Curso'}
+              </button>
             </form>
           </div>
         </div>
