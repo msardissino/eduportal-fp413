@@ -79,3 +79,12 @@
   flex-direction: column;
   gap: 8px;
 }
+
+@media (max-width: 1024px) {
+  .sidebar {
+    background-color: var(--bg-surface);
+    width: 280px;
+    box-shadow: 20px 0 50px rgba(0, 0, 0, 0.5);
+    border-right: none;
+  }
+}

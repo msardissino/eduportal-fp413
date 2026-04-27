@@ -1,0 +1,155 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.header {
+  margin-bottom: 8px;
+}
+
+.subtitle {
+  color: var(--text-muted);
+  margin-top: 8px;
+}
+
+.statsRow {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 24px;
+}
+
+.miniCard {
+  padding: 24px;
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.miniCard .icon {
+  background: var(--bg-surface-light);
+  color: var(--primary);
+  padding: 12px;
+  border-radius: var(--radius-md);
+  box-sizing: content-box;
+}
+
+.green { color: #10b981 !important; background: rgba(16, 185, 129, 0.1) !important; }
+
+.miniCard h3 {
+  font-size: 1.5rem;
+  font-weight: 800;
+}
+
+.miniCard p {
+  color: var(--text-dim);
+  font-size: 0.85rem;
+  text-transform: uppercase;
+}
+
+.tableCard {
+  border-radius: var(--radius-lg);
+  padding: 24px;
+}
+
+.tableHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
+}
+
+.tableActions {
+  display: flex;
+  gap: 12px;
+}
+
+.iconBtn {
+  background: var(--bg-surface-light);
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  padding: 8px;
+  border-radius: var(--radius-sm);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th {
+  padding: 16px;
+  color: var(--text-dim);
+  text-align: left;
+  font-size: 0.85rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.table td {
+  padding: 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.cellWithIcon {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 500;
+}
+
+.cellWithIcon svg {
+  color: var(--primary);
+  opacity: 0.7;
+}
+
+.statusBadge {
+  padding: 4px 12px;
+  border-radius: 100px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.cursando { background: rgba(59, 130, 246, 0.1); color: #3b82f6; }
+.egresado { background: rgba(16, 185, 129, 0.1); color: #10b981; }
+.abandono { background: rgba(239, 68, 68, 0.1); color: #ef4444; }
+.inscripto { background: rgba(255, 255, 255, 0.05); color: var(--text-dim); }
+
+.progressContainer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.progressBar {
+  flex: 1;
+  height: 6px;
+  background: var(--bg-surface-light);
+  border-radius: 10px;
+  overflow: hidden;
+  min-width: 80px;
+}
+
+.progressFill {
+  height: 100%;
+  background: var(--primary);
+  border-radius: 10px;
+}
+
+.gradeCell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+@media (max-width: 1024px) {
+  .table {
+    display: block;
+    overflow-x: auto;
+  }
+}

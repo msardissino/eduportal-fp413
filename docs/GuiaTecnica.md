@@ -35,15 +35,19 @@ src/
 3. Guardamos el **Rol** del usuario para decidir qué mostrar en el Sidebar.
 
 ### Configuración de Base de Datos (SQL):
-Para que los roles funcionen correctamente, debes crear una tabla `profiles` en tu SQL Editor de Supabase:
-```sql
-create table profiles (
-  id uuid references auth.users on delete cascade primary key,
-  role text check (role in ('alumno', 'docente', 'administrativo')) default 'alumno',
-  full_name text
-);
-```
-Luego, vincula cada usuario de `auth.users` con un registro en `profiles`.
+Para una gestión académica profesional, hemos diseñado un modelo relacional robusto. Puedes encontrar el script completo en `src/lib/schema.sql`.
+
+#### Tablas Principales:
+1.  **profiles**: Extiende `auth.users` para manejar roles (Alumno, Docente, Administrativo) y datos personales como DNI y especialidad.
+2.  **cursos**: Almacena la oferta académica, niveles (Básico, Intermedio, Avanzado) y modalidades.
+3.  **inscripciones**: Relaciona alumnos con cursos. Incluye lógica automática para determinar si un alumno es **Egresado**.
+
+#### Reglas de Negocio Automatizadas:
+Hemos implementado un **Trigger en PostgreSQL** que actualiza el estado del alumno a "Egresado" automáticamente si:
+- Su calificación final es `>= 6`.
+- Su asistencia es `>= 75%`.
+
+Esto reduce la carga administrativa y asegura la integridad de los datos académicos.
 
 ## 4. Mejores Prácticas Aplicadas
 - **Variables CSS**: Centralizamos colores y medidas en `:root` dentro de `index.css`. Si queremos cambiar el naranja institucional, lo hacemos en un solo lugar.

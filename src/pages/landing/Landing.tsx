@@ -1,33 +1,86 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { GraduationCap, ArrowRight, BookOpen, Users, Award, Sparkles } from 'lucide-react';
+import { GraduationCap, ArrowRight, BookOpen, Users, Award, Sparkles, Menu, X } from 'lucide-react';
 import styles from './Landing.module.css';
 import heroImage from '../../assets/hero-building.png';
 
 const Landing: React.FC = () => {
   const navigate = useNavigate();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const [isVisible, setIsVisible] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      
+      // Background change
+      setScrolled(currentScrollY > 20);
+      
+      // Hide/Show logic
+      if (currentScrollY > lastScrollY && currentScrollY > 100) {
+        setIsVisible(false); // Scrolling down
+      } else {
+        setIsVisible(true); // Scrolling up
+      }
+      
+      setLastScrollY(currentScrollY);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [lastScrollY]);
+
+  const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
   return (
-    <div className={styles.landing}>
-      <nav className={styles.navbar}>
-        <div className={styles.logo} onClick={() => navigate('/')}>
-          <div className={styles.logoIcon}>
-            <GraduationCap size={24} />
+    <div className={`${styles.landing} ${isMenuOpen ? styles.menuOpen : ''}`}>
+      <nav className={`${styles.navbar} ${scrolled ? styles.scrolled : ''} ${!isVisible ? styles.hidden : ''}`}>
+        <div className={styles.navContainer}>
+          <div className={styles.logo} onClick={() => navigate('/')}>
+            <div className={styles.logoIcon}>
+              <GraduationCap size={24} />
+            </div>
+            <span className={styles.logoText}>
+              EduPortal <span className={styles.muted}>FP 413</span>
+            </span>
           </div>
-          <span className={styles.logoText}>
-            EduPortal <span className={styles.muted}>FP 413</span>
-          </span>
-        </div>
-        <div className={styles.navLinks}>
-          <a href="#cursos">Cursos</a>
-          <a href="#nosotros">Nosotros</a>
-          <a href="#contacto">Contacto</a>
-          <button 
-            className={styles.loginBtn}
-            onClick={() => navigate('/login')}
-          >
-            Acceso Usuarios
+
+          {/* Desktop Nav */}
+          <div className={styles.navLinks}>
+            <a href="#cursos">Cursos</a>
+            <a href="#nosotros">Nosotros</a>
+            <a href="#contacto">Contacto</a>
+            <button 
+              className={styles.loginBtn}
+              onClick={() => navigate('/login')}
+            >
+              Acceso Usuarios
+            </button>
+          </div>
+
+          {/* Mobile Menu Toggle */}
+          <button className={styles.menuToggle} onClick={toggleMenu}>
+            {isMenuOpen ? <X size={28} /> : <Menu size={28} />}
           </button>
+        </div>
+
+        {/* Mobile Menu Overlay */}
+        <div className={`${styles.mobileMenu} ${isMenuOpen ? styles.active : ''}`}>
+          <div className={styles.mobileLinks}>
+            <a href="#cursos" onClick={toggleMenu}>Cursos</a>
+            <a href="#nosotros" onClick={toggleMenu}>Nosotros</a>
+            <a href="#contacto" onClick={toggleMenu}>Contacto</a>
+            <button 
+              className={styles.loginBtnMobile}
+              onClick={() => {
+                toggleMenu();
+                navigate('/login');
+              }}
+            >
+              Acceso Usuarios
+            </button>
+          </div>
         </div>
       </nav>
 

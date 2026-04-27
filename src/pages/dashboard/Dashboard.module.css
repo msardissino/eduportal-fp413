@@ -7,7 +7,8 @@
 .header {
   display: flex;
   justify-content: space-between;
-  align-items: flex-end;
+  align-items: center;
+  gap: 20px;
 }
 
 .subtitle {
@@ -145,6 +146,26 @@
 
 @media (max-width: 1024px) {
   .mainGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .actionButton {
+    width: 100%;
+    text-align: center;
+  }
+
+  .cardValue {
+    font-size: 1.5rem;
+  }
+
+  .statsGrid {
     grid-template-columns: 1fr;
   }
 }

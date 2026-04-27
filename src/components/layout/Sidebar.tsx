@@ -1,4 +1,3 @@
-import React from 'react';
 import { 
   LayoutDashboard, 
   Users, 
@@ -6,10 +5,15 @@ import {
   Calendar, 
   Settings, 
   LogOut,
-  GraduationCap
+  GraduationCap 
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
+import { Link, useLocation } from 'react-router-dom';
 import styles from './Sidebar.module.css';
+
+interface SidebarProps {
+  onClose?: () => void;
+}
 
 interface SidebarItemProps {
   icon: React.ElementType;
@@ -24,8 +28,9 @@ const SidebarItem: React.FC<SidebarItemProps> = ({ icon: Icon, label, active }) 
   </div>
 );
 
-export const Sidebar: React.FC = () => {
+export const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
   const role = localStorage.getItem('userRole') || 'alumno';
+  const location = useLocation();
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -34,11 +39,11 @@ export const Sidebar: React.FC = () => {
   };
 
   const menuItems = [
-    { icon: LayoutDashboard, label: "Dashboard", roles: ['alumno', 'docente', 'administrativo'] },
-    { icon: Users, label: "Alumnos", roles: ['docente', 'administrativo'] },
-    { icon: Users, label: "Docentes", roles: ['administrativo'] },
-    { icon: BookOpen, label: "Cursos", roles: ['alumno', 'administrativo'] },
-    { icon: Calendar, label: "Asistencia", roles: ['alumno', 'docente', 'administrativo'] },
+    { icon: LayoutDashboard, label: "Dashboard", path: "/dashboard", roles: ['alumno', 'docente', 'administrativo'] },
+    { icon: Users, label: "Alumnos", path: "/dashboard/alumnos", roles: ['docente', 'administrativo'] },
+    { icon: GraduationCap, label: "Docentes", path: "/dashboard/docentes", roles: ['administrativo'] },
+    { icon: BookOpen, label: "Cursos", path: "/dashboard/cursos", roles: ['alumno', 'administrativo'] },
+    { icon: Calendar, label: "Inscripciones", path: "/dashboard/inscripciones", roles: ['alumno', 'docente', 'administrativo'] },
   ];
 
   const filteredItems = menuItems.filter(item => item.roles.includes(role));
@@ -54,12 +59,18 @@ export const Sidebar: React.FC = () => {
 
       <nav className={styles.nav}>
         {filteredItems.map((item, idx) => (
-          <SidebarItem 
+          <Link 
             key={idx} 
-            icon={item.icon} 
-            label={item.label} 
-            active={item.label === "Dashboard"} 
-          />
+            to={item.path} 
+            onClick={() => onClose?.()}
+            style={{ textDecoration: 'none', color: 'inherit' }}
+          >
+            <SidebarItem 
+              icon={item.icon} 
+              label={item.label} 
+              active={location.pathname === item.path} 
+            />
+          </Link>
         ))}
         
         <div className={styles.footer}>

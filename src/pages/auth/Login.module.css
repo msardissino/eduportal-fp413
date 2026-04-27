@@ -213,3 +213,24 @@
     padding: 40px;
   }
 }
+
+@media (max-width: 480px) {
+  .loginContainer {
+    padding: 24px;
+  }
+  .header h1 {
+    font-size: 1.8rem;
+  }
+  .logo {
+    margin-bottom: 32px;
+  }
+  .roleBtn {
+    padding: 10px 4px;
+    font-size: 0.8rem;
+    gap: 4px;
+  }
+  .roleBtn svg {
+    width: 16px;
+    height: 16px;
+  }
+}
