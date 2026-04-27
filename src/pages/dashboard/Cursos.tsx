@@ -11,6 +11,8 @@ interface Course {
   carga_horaria_total: number;
   modalidad: string;
   id_docente?: string;
+  dias_cursada?: string[];
+  turno?: string;
   created_at: string;
 }
 
@@ -31,13 +33,25 @@ const Cursos: React.FC = () => {
   const role = localStorage.getItem('userRole') || 'alumno';
 
   // Form State
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    nombre: string;
+    nivel: string;
+    carga_horaria_total: number;
+    modalidad: string;
+    id_docente: string;
+    dias_cursada: string[];
+    turno: string;
+  }>({
     nombre: '',
     nivel: 'Básico',
     carga_horaria_total: 0,
     modalidad: 'Presencial',
-    id_docente: ''
+    id_docente: '',
+    dias_cursada: [],
+    turno: 'Noche'
   });
+
+  const diasOptions = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
 
   useEffect(() => {
     fetchCourses();
@@ -83,7 +97,9 @@ const Cursos: React.FC = () => {
       nivel: 'Básico',
       carga_horaria_total: 0,
       modalidad: 'Presencial',
-      id_docente: ''
+      id_docente: '',
+      dias_cursada: [],
+      turno: 'Noche'
     });
     setIsModalOpen(true);
   };
@@ -96,9 +112,20 @@ const Cursos: React.FC = () => {
       nivel: course.nivel,
       carga_horaria_total: course.carga_horaria_total,
       modalidad: course.modalidad,
-      id_docente: course.id_docente || ''
+      id_docente: course.id_docente || '',
+      dias_cursada: course.dias_cursada || [],
+      turno: course.turno || 'Noche'
     });
     setIsModalOpen(true);
+  };
+
+  const handleDayToggle = (day: string) => {
+    setFormData(prev => ({
+      ...prev,
+      dias_cursada: prev.dias_cursada.includes(day)
+        ? prev.dias_cursada.filter(d => d !== day)
+        : [...prev.dias_cursada, day]
+    }));
   };
 
   const handleDeleteCourse = async (id: string, name: string) => {
@@ -200,13 +227,20 @@ const Cursos: React.FC = () => {
               <div className={styles.cardInfo}>
                 <div className={styles.infoItem}>
                   <Clock size={16} />
-                  <span>{course.carga_horaria_total}hs</span>
+                  <span>{course.carga_horaria_total}hs ({course.turno || 'Noche'})</span>
                 </div>
                 <div className={styles.infoItem}>
                   <GraduationCap size={16} />
                   <span>{course.modalidad}</span>
                 </div>
               </div>
+              {course.dias_cursada && course.dias_cursada.length > 0 && (
+                <div className={styles.daysList}>
+                  {course.dias_cursada.map(d => (
+                    <span key={d} className={styles.dayBadge}>{d.substring(0, 3)}</span>
+                  ))}
+                </div>
+              )}
               <div className={styles.cardActions}>
                 <button 
                   className={styles.viewBtn} 
@@ -280,6 +314,34 @@ const Cursos: React.FC = () => {
                     <option value="Presencial">Presencial</option>
                     <option value="Virtual">Virtual</option>
                     <option value="Híbrida">Híbrida</option>
+                  </select>
+                </div>
+              </div>
+              <div className={styles.formRow}>
+                <div className={styles.formGroup}>
+                  <label>Días de Cursada</label>
+                  <div className={styles.daysToggleGroup}>
+                    {diasOptions.map(day => (
+                      <button
+                        type="button"
+                        key={day}
+                        className={`${styles.dayToggleButton} ${formData.dias_cursada.includes(day) ? styles.active : ''}`}
+                        onClick={() => handleDayToggle(day)}
+                      >
+                        {day.substring(0, 3)}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div className={styles.formGroup}>
+                  <label>Turno</label>
+                  <select 
+                    value={formData.turno}
+                    onChange={(e) => setFormData({...formData, turno: e.target.value})}
+                  >
+                    <option value="Mañana">Mañana</option>
+                    <option value="Tarde">Tarde</option>
+                    <option value="Noche">Noche</option>
                   </select>
                 </div>
               </div>

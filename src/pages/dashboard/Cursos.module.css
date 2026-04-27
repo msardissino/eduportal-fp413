@@ -291,6 +291,51 @@
   margin-top: 10px;
 }
 
+.daysToggleGroup {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.dayToggleButton {
+  background: var(--bg-surface-light);
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  padding: 8px 12px;
+  border-radius: var(--radius-md);
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: var(--transition);
+}
+
+.dayToggleButton:hover {
+  border-color: var(--primary);
+  color: white;
+}
+
+.dayToggleButton.active {
+  background: rgba(var(--primary-rgb), 0.1);
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.daysList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.dayBadge {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+}
+
 @keyframes modalEnter {
   from { opacity: 0; transform: scale(0.95); }
   to { opacity: 1; transform: scale(1); }
