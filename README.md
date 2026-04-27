@@ -1,73 +1,42 @@
-# React + TypeScript + Vite
+# EduPortal - CFP 413
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Plataforma de gestión académica para el Centro de Formación Profesional 413.
 
-Currently, two official plugins are available:
+## Tecnologías
+- **Frontend**: React 19 + TypeScript + Vite
+- **Estilos**: CSS Modules (Aesthetic Premium/Glassmorphism)
+- **Backend**: Supabase (Base de Datos + Auth)
+- **Iconos**: Lucide React
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Configuración Local
 
-## React Compiler
+1. Clona el repositorio.
+2. Instala las dependencias:
+   ```bash
+   npm install
+   ```
+3. Crea un archivo `.env` en la raíz con tus credenciales de Supabase:
+   ```env
+   VITE_SUPABASE_URL=tu_url_de_supabase
+   VITE_SUPABASE_ANON_KEY=tu_anon_key
+   ```
+4. Ejecuta el servidor de desarrollo:
+   ```bash
+   npm run dev
+   ```
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Base de Datos
+El esquema de la base de datos se encuentra en `src/lib/schema.sql`. Para nuevos proyectos de Supabase, copia y pega el contenido de este archivo en el **SQL Editor** de Supabase y ejecútalo.
 
-## Expanding the ESLint configuration
+## Prevención de Pausa (Keep Alive)
+Para evitar que Supabase pause el proyecto por inactividad, hemos configurado un GitHub Action que realiza un ping diario.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+**IMPORTANTE**: Para que esto funcione, debes configurar los siguientes **Secrets** en tu repositorio de GitHub (Settings > Secrets and variables > Actions):
+- `SUPABASE_URL`: La URL de tu proyecto.
+- `SUPABASE_ANON_KEY`: La clave anónima de tu proyecto.
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
-
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+## Estructura del Proyecto
+- `/src/components`: Componentes reutilizables.
+- `/src/pages`: Vistas principales (Landing, Login, Dashboard).
+- `/src/lib`: Configuraciones (Supabase client, Schema SQL).
+- `/src/assets`: Recursos estáticos.
