@@ -20,6 +20,8 @@ const Alumnos: React.FC = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 6;
 
   // Form State
   const [formData, setFormData] = useState({
@@ -125,6 +127,14 @@ const Alumnos: React.FC = () => {
     a.dni.includes(searchTerm)
   );
 
+  const totalPages = Math.ceil(filtered.length / itemsPerPage);
+  const paginatedData = filtered.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+
+  // Reset page on search
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm]);
+
   return (
     <div className={styles.container}>
       <header className={styles.header}>
@@ -160,7 +170,7 @@ const Alumnos: React.FC = () => {
             </tr>
           </thead>
           <tbody>
-            {filtered.map(alumno => (
+            {paginatedData.map(alumno => (
               <tr key={alumno.id}>
                 <td>
                   <div className={styles.nameCell}>
@@ -213,8 +223,35 @@ const Alumnos: React.FC = () => {
                 </td>
               </tr>
             ))}
+            {paginatedData.length === 0 && (
+              <tr>
+                <td colSpan={5} style={{ textAlign: 'center', padding: '32px', color: 'var(--text-dim)' }}>
+                  No se encontraron alumnos.
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
+
+        {totalPages > 1 && (
+          <div className={styles.pagination}>
+            <button 
+              disabled={currentPage === 1}
+              onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+              className={styles.pageBtn}
+            >
+              Anterior
+            </button>
+            <span className={styles.pageInfo}>Página {currentPage} de {totalPages}</span>
+            <button 
+              disabled={currentPage === totalPages}
+              onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+              className={styles.pageBtn}
+            >
+              Siguiente
+            </button>
+          </div>
+        )}
       </div>
 
       {isModalOpen && (

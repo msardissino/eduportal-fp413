@@ -52,14 +52,14 @@
   border: 1px solid var(--border);
   padding: 12px 16px 12px 48px;
   border-radius: var(--radius-md);
-  color: white;
+  color: var(--text-main);
   font-family: inherit;
   transition: var(--transition);
 }
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 24px;
 }
 
@@ -138,7 +138,7 @@
   padding: 12px;
   background: var(--bg-surface-light);
   border: 1px solid var(--border);
-  color: white;
+  color: var(--text-main);
   border-radius: var(--radius-md);
   font-weight: 600;
   transition: var(--transition);
@@ -207,7 +207,7 @@
   border: 1px solid var(--border);
   padding: 12px;
   border-radius: var(--radius-md);
-  color: white;
+  color: var(--text-main);
 }
 
 .submitBtn {
@@ -223,4 +223,40 @@
   .header { flex-direction: column; align-items: flex-start; gap: 20px; }
   .addBtn { width: 100%; justify-content: center; }
   .formRow { grid-template-columns: 1fr; }
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  border-top: 1px solid var(--border);
+  margin-top: 8px;
+}
+
+.pageBtn {
+  background: var(--bg-surface-light);
+  border: 1px solid var(--border);
+  color: var(--text-main);
+  padding: 8px 16px;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  font-size: 0.85rem;
+  transition: var(--transition);
+}
+
+.pageBtn:hover:not(:disabled) {
+  border-color: var(--primary);
+  background: rgba(var(--primary-rgb), 0.1);
+}
+
+.pageBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.pageInfo {
+  font-size: 0.9rem;
+  color: var(--text-dim);
 }
