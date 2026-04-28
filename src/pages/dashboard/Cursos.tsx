@@ -168,6 +168,7 @@ const Cursos: React.FC = () => {
       setIsModalOpen(false);
       fetchCourses();
     } catch (error) {
+      console.error('Error al guardar el curso:', error);
       alert(isEditing ? 'Error al actualizar el curso.' : 'Error al crear el curso.');
     }
   };

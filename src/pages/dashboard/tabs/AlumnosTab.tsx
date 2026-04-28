@@ -1,6 +1,7 @@
 import React from 'react';
-import { Plus } from 'lucide-react';
+import { Plus, Download } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import * as XLSX from 'xlsx';
 import styles from '../CourseDetail.module.css';
 
 interface Props {
@@ -10,15 +11,52 @@ interface Props {
 
 const AlumnosTab: React.FC<Props> = ({ students, role }) => {
   const navigate = useNavigate();
+
+  const exportToExcel = () => {
+    const dataToExport = students.map(s => {
+      const profile = Array.isArray(s.profiles) ? s.profiles[0] : s.profiles;
+      return {
+        'Nombre': profile?.full_name || 'Desconocido',
+        'DNI': profile?.dni || '---',
+        'Estado': s.estado,
+        'Asistencia (%)': s.asistencia_porcentaje,
+        'Calificación Final': s.calificacion_final || '0'
+      };
+    });
+
+    const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Alumnos");
+    
+    // Auto-ajustar ancho de columnas
+    const wscols = [
+      {wch: 30}, // Nombre
+      {wch: 15}, // DNI
+      {wch: 15}, // Estado
+      {wch: 15}, // Asistencia
+      {wch: 15}  // Calificación
+    ];
+    worksheet['!cols'] = wscols;
+
+    XLSX.writeFile(workbook, "Planilla_Alumnos.xlsx");
+  };
+
   return (
     <div className={styles.section + " glass"}>
       <div className={styles.sectionHeader}>
         <h3>Alumnos Inscriptos</h3>
-        {(role === 'docente' || role === 'administrativo') && (
-          <button className={styles.inscribirBtn}>
-            <Plus size={16} /> Inscribir Nuevo
-          </button>
-        )}
+        <div style={{ display: 'flex', gap: '10px' }}>
+          {(role === 'docente' || role === 'administrativo') && (
+            <>
+              <button onClick={exportToExcel} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 16px', background: 'rgba(16, 185, 129, 0.2)', color: '#10b981', border: '1px solid #10b981', borderRadius: '8px', cursor: 'pointer', fontSize: '0.9rem', fontWeight: '500' }}>
+                <Download size={16} /> Exportar Excel
+              </button>
+              <button className={styles.inscribirBtn}>
+                <Plus size={16} /> Inscribir Nuevo
+              </button>
+            </>
+          )}
+        </div>
       </div>
       <div className={styles.tableResponsive}>
         <table className={styles.table}>

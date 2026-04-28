@@ -6,6 +6,7 @@ import AsistenciaTab from './tabs/AsistenciaTab';
 import MaterialesTab from './tabs/MaterialesTab';
 import ChatTab from './tabs/ChatTab';
 import TramitesTab from './tabs/TramitesTab';
+import CalendarioTab from './tabs/CalendarioTab';
 import { supabase } from '../../lib/supabase';
 import styles from './CourseDetail.module.css';
 
@@ -134,6 +135,12 @@ const CourseDetail: React.FC = () => {
             </button>
           )}
           <button 
+            className={`${styles.tabBtn} ${activeTab === 'calendario' ? styles.activeTab : ''}`}
+            onClick={() => setActiveTab('calendario')}
+          >
+            Calendario
+          </button>
+          <button 
             className={`${styles.tabBtn} ${activeTab === 'materiales' ? styles.activeTab : ''}`}
             onClick={() => setActiveTab('materiales')}
           >
@@ -160,6 +167,7 @@ const CourseDetail: React.FC = () => {
         <div className={styles.mainContent}>
           {activeTab === 'alumnos' && <AlumnosTab students={students} role={role} />}
           {activeTab === 'asistencia' && <AsistenciaTab courseId={id!} students={students} />}
+          {activeTab === 'calendario' && <CalendarioTab courseId={id!} role={role} />}
           {activeTab === 'materiales' && <MaterialesTab courseId={id!} role={role} />}
           {activeTab === 'chat' && <ChatTab courseId={id!} role={role} />}
           {activeTab === 'tramites' && <TramitesTab courseId={id!} role={role} />}
